@@ -50,6 +50,7 @@ namespace WINDOW {
 
     void init();
     void clrscr();
+    void setCursorInvisible();
 
     int selectMenu(int menuSize, std::string menu[]);
 }

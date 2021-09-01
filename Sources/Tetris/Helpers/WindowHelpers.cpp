@@ -25,10 +25,21 @@ void WINDOW::init() {
     char setSizeCommand[30];
     sprintf(setSizeCommand, "mode con: cols=%d lines=%d", WINDOW_SIZE_COL, WINDOW_SIZE_ROW);
     system(setSizeCommand);
+
+    // set cursor invisible
+    WINDOW::setCursorInvisible();
 }
 
 void WINDOW::clrscr() {
     system("cls");
+}
+
+void WINDOW::setCursorInvisible() {
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO ConsoleCursor;
+    ConsoleCursor.bVisible = 0;
+    ConsoleCursor.dwSize = 1;
+    SetConsoleCursorInfo(consoleHandle , &ConsoleCursor);
 }
 
 int WINDOW::selectMenu(int menuSize, std::string menu[]) {
