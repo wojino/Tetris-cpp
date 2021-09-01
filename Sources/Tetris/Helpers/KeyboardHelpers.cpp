@@ -1,13 +1,13 @@
 #include "KeyboardHelpers.hpp"
 
-int KEYBOARD::keyInput() {
-    int input = _getch();
+KEY KEYBOARD::keyInput() {
+    KEY input = static_cast<KEY>(_getch());
 
-    if (static_cast<KEY>(input) == KEY::MAGIC_KEY) {
-        input = _getch();
+    if (input == KEY::MAGIC_KEY) {
+        input = static_cast<KEY>(_getch());
     }
 
-    if ((static_cast<KEY>(input) == KEY::q) || (static_cast<KEY>(input) ==KEY::Q)) {
+    if ((input == KEY::q) || (input==KEY::Q)) {
         WINDOW::clrscr();
         exit(0);
     }

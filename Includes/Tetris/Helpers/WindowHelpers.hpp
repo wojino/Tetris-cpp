@@ -1,12 +1,12 @@
-#ifndef WINDOW_HELPERS_HPP
-#define WINDOW_HELPERS_HPP
+#ifndef TETRIS_WINDOW_HELPERS_HPP
+#define TETRIS_WINDOW_HELPERS_HPP
 
 #include "KeyboardHelpers.hpp"
 
 #include <conio.h>
 #include <windows.h>
 #include <string>
-#include <cstdio>
+#include <iostream>
 #include <cstdint>
 
 /* Window constants */
@@ -20,8 +20,8 @@
 #define MENU_LINE_INTERVAL 2
 
 /* Symbols */
-#define CURSOR '>'
-#define BLANK ' '
+#define CURSOR "> "
+#define BLANK "  "
 
 /* Colors */
 enum class COLOR {
@@ -46,14 +46,12 @@ enum class COLOR {
 namespace WINDOW {
     void gotoxy(int x, int y);
     void setColor(COLOR color);
-    void printLeft(int x, int y, std::string str, COLOR color = COLOR::WHITE);
-    void printRight(int x, int y, std::string str, COLOR color = COLOR::WHITE);
-    void printChar(int x, int y, char ch, COLOR color = COLOR::WHITE);
+    void print(int x, int y, std::string str, COLOR color = COLOR::WHITE);
 
     void init();
     void clrscr();
 
-    int choiceMenu(int menuSize, std::string menu[]);
+    int selectMenu(int menuSize, std::string menu[]);
 }
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_HELPERS_HPP
-#define KEYBOARD_HELPERS_HPP
+#ifndef TETRIS_KEYBOARD_HELPERS_HPP
+#define TETRIS_KEYBOARD_HELPERS_HPP
 
 #include "WindowHelpers.hpp"
 
@@ -18,11 +18,13 @@ enum class KEY {
     q = 113,
     Q = 81,
     z = 122,
-    Z = 90
+    Z = 90,
+    x = 120,
+    X = 88
 };
 
 namespace KEYBOARD {
-    int keyInput();
+    KEY keyInput();
 }
 
 #endif

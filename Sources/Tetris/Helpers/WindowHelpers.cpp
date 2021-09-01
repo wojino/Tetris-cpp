@@ -11,22 +11,10 @@ void WINDOW::setColor(COLOR color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), static_cast<int>(color));
 }
 
-void WINDOW::printLeft(int x, int y, std::string str, COLOR color) {
+void WINDOW::print(int x, int y, std::string str, COLOR color) {
     WINDOW::gotoxy(x, y);
     WINDOW::setColor(color);
-    printf("%s", str.c_str());
-}
-
-void WINDOW::printRight(int x, int y, std::string str, COLOR color) {
-    WINDOW::gotoxy(x - str.length(), y);
-    WINDOW::setColor(color);
-    printf("%s", str.c_str());
-}
-
-void WINDOW::printChar(int x, int y, char ch, COLOR color) {
-    WINDOW::gotoxy(x, y);
-    WINDOW::setColor(color);
-    printf("%c", ch);
+    std::cout << str;
 }
 
 void WINDOW::init() {
@@ -43,19 +31,19 @@ void WINDOW::clrscr() {
     system("cls");
 }
 
-int WINDOW::choiceMenu(int menuSize, std::string menu[]) {
+int WINDOW::selectMenu(int menuSize, std::string menu[]) {
     for(int i=0; i<menuSize; i++) {
-        WINDOW::printLeft(MENU_LINE_X, MENU_LINE_Y + (i * MENU_LINE_INTERVAL), menu[i]);
+        WINDOW::print(MENU_LINE_X, MENU_LINE_Y + (i * MENU_LINE_INTERVAL), menu[i]);
     }
     COORD cursor;
     cursor.X = MENU_LINE_X-2;
     cursor.Y = MENU_LINE_Y;
     
     int pos = 0, newpos = 0;
-    WINDOW::printChar(cursor.X, cursor.Y, CURSOR);
+    WINDOW::print(cursor.X, cursor.Y, CURSOR);
 
     while(true) {
-        switch(static_cast<KEY>(KEYBOARD::keyInput())) {
+        switch(KEYBOARD::keyInput()) {
             case KEY::DOWN:
                 if(pos == menuSize - 1) {
                     newpos = 0;
@@ -73,8 +61,6 @@ int WINDOW::choiceMenu(int menuSize, std::string menu[]) {
                 break;
 
             case KEY::z:
-                return pos;
-            
             case KEY::Z:
                 return pos;
 
@@ -82,8 +68,8 @@ int WINDOW::choiceMenu(int menuSize, std::string menu[]) {
                 break;
         }
 
-        WINDOW::printChar(cursor.X, cursor.Y + (pos * MENU_LINE_INTERVAL), BLANK);
-        WINDOW::printChar(cursor.X, cursor.Y + (newpos * MENU_LINE_INTERVAL), CURSOR);
+        WINDOW::print(cursor.X, cursor.Y + (pos * MENU_LINE_INTERVAL), BLANK);
+        WINDOW::print(cursor.X, cursor.Y + (newpos * MENU_LINE_INTERVAL), CURSOR);
 
         pos = newpos;
     }
