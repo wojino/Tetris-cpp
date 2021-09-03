@@ -76,65 +76,133 @@ int wallkickI[2][4][5][2] = {
     }
 };
 
-int map[BOARD_SIZE_X][BOARD_SIZE_Y] = {};
-
+bool map[BOARD_SIZE_X][BOARD_SIZE_Y] = {false};
+bool line[BOARD_SIZE_Y] = {false};
 /* Initialize */
 void TETRIS::init() {
     WINDOW::clrscr();
     TETRIS::drawBoard();
 
-    Tetromino tetromino = TETRIS::addTetromino(0, 0, TYPE::S, 0);
-
+    int n=0;
+    int* randomArray = TETRIS::randomGenerator();
+    
+    Tetromino tetromino = TETRIS::addTetromino(START_X, START_Y, static_cast<TYPE>(randomArray[n]), 0);
+    
     while(TETRIS::isGameContinue()) {
         KEY key = KEYBOARD::keyInput();
         CONTROL control = TETRIS::keyToControl(key);
-        tetromino = TETRIS::controlTetromino(tetromino, control);
+
+        if(control == CONTROL::HARDDROP) {
+            TETRIS::controlTetromino(tetromino, control);
+            TETRIS::drawTetromino(tetromino, STATE::FIX);
+            TETRIS::mapTetromino(tetromino, STATE::FIX);
+
+            n++;
+            tetromino = TETRIS::addTetromino(START_X, START_Y, static_cast<TYPE>(randomArray[n]), 0);
+        }
+        else if((!TETRIS::isDownAvailable(tetromino)) && (control == CONTROL::SOFTDROP)) {
+            TETRIS::drawTetromino(tetromino, STATE::FIX);
+            TETRIS::mapTetromino(tetromino, STATE::FIX);
+
+            n++;
+            tetromino = TETRIS::addTetromino(START_X, START_Y, static_cast<TYPE>(randomArray[n]), 0);
+        }
+        else {
+            TETRIS::controlTetromino(tetromino, control);
+        }
     }
+    
 }
 
 /* Board */
 void TETRIS::drawBoard() {
     int x = BOARD_X - 2;
-    int y = BOARD_Y - 1;
+    int y = BOARD_Y + 1;
+    // up
     for(int i=0; i<(BOARD_SIZE_X+2)*BLOCK_SIZE; i+=BLOCK_SIZE) {
         WINDOW::print(x+i, y, BLOCK, COLOR::DARK_GRAY);
     }
+    // down
     for(int i=0; i<(BOARD_SIZE_X+2)*BLOCK_SIZE; i+=BLOCK_SIZE) {
-        WINDOW::print(x+i, y+BOARD_SIZE_Y+1, BLOCK, COLOR::DARK_GRAY);
+        WINDOW::print(x+i, y+BOARD_SIZE_Y-1, BLOCK, COLOR::DARK_GRAY);
     }
-    for(int i=0; i<BOARD_SIZE_Y; i++) {
+    // left
+    for(int i=0; i<BOARD_SIZE_Y-2; i++) {
         WINDOW::print(x, y+i+1, BLOCK, COLOR::DARK_GRAY);
     }
-    for(int i=0; i<BOARD_SIZE_Y; i++) {
+    // right
+    for(int i=0; i<BOARD_SIZE_Y-2; i++) {
         WINDOW::print(x+11*BLOCK_SIZE, y+i+1, BLOCK, COLOR::DARK_GRAY);
     }
 }
 
 /* Tetromino */
-void TETRIS::drawTetromino(Tetromino tetromino, DRAW draw) {
+void TETRIS::drawTetromino(Tetromino tetromino, STATE state) {
     int x, y, i;
 
-    switch(draw) {
-        case DRAW::ON:
+    switch(state) {
+        case STATE::ON:
             for(i=0; i<4; i++) {
                 x = BOARD_X + (tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0])*BLOCK_SIZE;
                 y = BOARD_Y + tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                if(y < BOARD_Y+2) continue;
                 WINDOW::print(x, y, BLOCK);
             }
             break;
         
-        case DRAW::OFF:
+        case STATE::OFF:
             for(i=0; i<4; i++) {
                 x = BOARD_X + (tetromino.origin.X+ block[static_cast<int>(tetromino.type)][tetromino.direction][i][0])*BLOCK_SIZE;
                 y = BOARD_Y + tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                if(y < BOARD_Y+2) continue;
                 WINDOW::print(x, y, BLANK);
             }
-            break;   
+            break;
+        
+        case STATE::FIX:
+            for(i=0; i<4; i++) {
+                x = BOARD_X + (tetromino.origin.X+ block[static_cast<int>(tetromino.type)][tetromino.direction][i][0])*BLOCK_SIZE;
+                y = BOARD_Y + tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                if(y < BOARD_Y+2) continue;
+                WINDOW::print(x, y, BLOCK, COLOR::DARK_BLUE);
+            }
+            break;
     }
 }
 
-Tetromino TETRIS::controlTetromino(Tetromino tetromino, CONTROL control) {
-    TETRIS::drawTetromino(tetromino, DRAW::OFF);
+void TETRIS::mapTetromino(Tetromino tetromino, STATE state) {
+    int x, y, i;
+
+    switch(state) {
+        case STATE::ON:
+            for(i=0; i<4; i++) {
+                x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
+                y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                map[x][y] = true;
+            }
+            break;
+        
+        case STATE::OFF:
+            for(i=0; i<4; i++) {
+                x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
+                y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                map[x][y] = false;
+            }
+            break;
+        
+        case STATE::FIX:
+            for(i=0; i<4; i++) {
+                x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
+                y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
+                map[x][y] = true;
+            }
+            break;
+    }
+}
+
+void TETRIS::controlTetromino(Tetromino &tetromino, CONTROL control) {
+    TETRIS::drawTetromino(tetromino, STATE::OFF);
+    TETRIS::mapTetromino(tetromino, STATE::OFF);
     Tetromino newTetromino = tetromino;
 
     switch(control) {
@@ -159,7 +227,6 @@ Tetromino TETRIS::controlTetromino(Tetromino tetromino, CONTROL control) {
                     }
                 }
             }
-            
             
             break;
         
@@ -206,7 +273,7 @@ Tetromino TETRIS::controlTetromino(Tetromino tetromino, CONTROL control) {
             break;
         
         case CONTROL::SOFTDROP:
-            newTetromino.origin.Y = tetromino.origin.Y + 1;
+            newTetromino.origin.Y = newTetromino.origin.Y + 1;
 
             if(!TETRIS::isPositionAvailable(newTetromino)) {
                 newTetromino = tetromino;
@@ -215,7 +282,7 @@ Tetromino TETRIS::controlTetromino(Tetromino tetromino, CONTROL control) {
             break;
         
         case CONTROL::HARDDROP:
-            newTetromino.origin.Y = tetromino.origin.Y + 1;
+            newTetromino.origin.Y = newTetromino.origin.Y + 1;
 
             if(!TETRIS::isPositionAvailable(newTetromino)) {
                 newTetromino = tetromino;
@@ -224,8 +291,9 @@ Tetromino TETRIS::controlTetromino(Tetromino tetromino, CONTROL control) {
             break;
     }
 
-    TETRIS::drawTetromino(newTetromino, DRAW::ON);
-    return newTetromino;
+    tetromino = newTetromino;
+    TETRIS::drawTetromino(tetromino, STATE::ON);
+    TETRIS::mapTetromino(tetromino, STATE::ON);
 }
 
 Tetromino TETRIS::addTetromino(int x, int y, TYPE _type, int _direction) {
@@ -234,7 +302,8 @@ Tetromino TETRIS::addTetromino(int x, int y, TYPE _type, int _direction) {
     tetromino.type = _type;
     tetromino.direction = _direction;
     
-    TETRIS::drawTetromino(tetromino, DRAW::ON);
+    TETRIS::drawTetromino(tetromino, STATE::ON);
+    TETRIS::mapTetromino(tetromino, STATE::ON);
 
     return tetromino;
 }
@@ -245,20 +314,34 @@ bool TETRIS::isPositionAvailable(Tetromino tetromino) {
         int y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
         
         if((x < 0) || (x >= BOARD_SIZE_X) || (y < 0) || (y >=BOARD_SIZE_Y)) {
-            return FALSE;
+            return false;
         }
-        
         if(map[x][y] == 1) {
-            return FALSE;
+            return false;
         }
     }
 
-    return TRUE;
+    return true;
 }
+
+bool TETRIS::isDownAvailable(Tetromino tetromino) {
+    Tetromino newTetromino = tetromino;
+    newTetromino.origin.Y = tetromino.origin.Y+1;
+    
+    TETRIS::mapTetromino(tetromino, STATE::OFF);
+    if(TETRIS::isPositionAvailable(newTetromino)) {
+        TETRIS::mapTetromino(tetromino, STATE::ON);
+        return true;
+    }
+    else {
+        TETRIS::mapTetromino(tetromino, STATE::ON);
+        return false;
+    }
+}   
 
 /* Game */
 bool TETRIS::isGameContinue() {
-    return TRUE;
+    return true;
 }
 
 /* Util */
@@ -288,4 +371,17 @@ CONTROL TETRIS::keyToControl(KEY key) {
             return CONTROL::SOFTDROP;
 
     }
+}
+
+int* TETRIS::randomGenerator() {
+    static int randomArray[1000];
+    time_t t;
+    t = time(NULL);
+    std::mt19937 gen(t);
+    std::uniform_int_distribution<int> dis(0, 6);
+
+    for(int i=0; i<1000; i++) {
+        randomArray[i] = dis(gen);
+    }
+    return randomArray;
 }
