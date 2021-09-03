@@ -31,29 +31,18 @@ enum class CONTROL {
     CCW, CW, LEFT, RIGHT, SOFTDROP, HARDDROP
 };
 
-
-// https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location
-extern int block[7][4][4][2];
-extern int wallkickNormal[2][4][5][2];
-extern int wallkickI[2][4][5][2];
-extern bool map[BOARD_SIZE_X][BOARD_SIZE_Y];
-extern bool map[BOARD_SIZE_Y];
-
-
 typedef struct _Tetromino {
     COORD origin;
     TYPE type;
     int direction;
-
-    _Tetromino(COORD _origin, TYPE _type, int _direction):
-        origin{_origin}, type{_type}, direction{_direction} {}
-    
-    _Tetromino():
-        origin{{}}, type{TYPE::I}, direction{0} {}
-
 } Tetromino;
 
 namespace TETRIS {
+    extern int block[7][4][4][2];
+    extern int wallkickNormal[2][4][5][2];
+    extern int wallkickI[2][4][5][2];
+    extern bool map[BOARD_SIZE_X][BOARD_SIZE_Y];
+
     /* Initialize */
     void init();
 

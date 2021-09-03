@@ -1,6 +1,7 @@
 #include "Tetris.hpp"
 
-int block[7][4][4][2] = {
+
+int TETRIS::block[7][4][4][2] = {
     {   /* I block */
         {{0,1},{1,1},{2,1},{3,1}},
         {{2,0},{2,1},{2,2},{2,3}},
@@ -45,7 +46,7 @@ int block[7][4][4][2] = {
     }
 };
 
-int wallkickNormal[2][4][5][2] = {
+int TETRIS::wallkickNormal[2][4][5][2] = {
     {   /* CCW */
         {{ 0, 0},{ 1, 0},{ 1,-1},{ 0, 2},{ 1, 2}}, // 0 >> 3
         {{ 0, 0},{ 1, 0},{ 1, 1},{ 0,-2},{ 1,-2}}, // 1 >> 0
@@ -61,7 +62,7 @@ int wallkickNormal[2][4][5][2] = {
     
 };
 
-int wallkickI[2][4][5][2] = {
+int TETRIS::wallkickI[2][4][5][2] = {
     {   /* CCW */
         {{ 0, 0},{-1, 0},{ 2, 0},{-1,-2},{ 2, 1}}, // 0 >> 3
         {{ 0, 0},{ 2, 0},{-1, 0},{ 2,-1},{-1, 2}}, // 1 >> 0
@@ -76,8 +77,8 @@ int wallkickI[2][4][5][2] = {
     }
 };
 
-bool map[BOARD_SIZE_X][BOARD_SIZE_Y] = {false};
-bool line[BOARD_SIZE_Y] = {false};
+bool TETRIS::map[BOARD_SIZE_X][BOARD_SIZE_Y] = {false};
+
 /* Initialize */
 void TETRIS::init() {
     WINDOW::clrscr();
