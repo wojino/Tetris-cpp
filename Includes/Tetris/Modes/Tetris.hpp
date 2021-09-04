@@ -41,7 +41,7 @@ namespace TETRIS {
     extern int block[7][4][4][2];
     extern int wallkickNormal[2][4][5][2];
     extern int wallkickI[2][4][5][2];
-    extern bool map[BOARD_SIZE_X][BOARD_SIZE_Y];
+    extern int map[BOARD_SIZE_X][BOARD_SIZE_Y];
 
     /* Initialize */
     void init();
@@ -58,7 +58,7 @@ namespace TETRIS {
     bool isDownAvailable(Tetromino tetromino);
 
     /* Game */
-    bool isGameContinue();
+    bool isGameContinue(Tetromino tetromino);
 
     /* Util */
     CONTROL keyToControl(KEY key);

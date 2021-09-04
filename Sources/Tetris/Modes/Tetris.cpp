@@ -77,7 +77,7 @@ int TETRIS::wallkickI[2][4][5][2] = {
     }
 };
 
-bool TETRIS::map[BOARD_SIZE_X][BOARD_SIZE_Y] = {false};
+int TETRIS::map[BOARD_SIZE_X][BOARD_SIZE_Y] = {0};
 
 /* Initialize */
 void TETRIS::init() {
@@ -89,10 +89,11 @@ void TETRIS::init() {
     
     Tetromino tetromino = TETRIS::addTetromino(START_X, START_Y, static_cast<TYPE>(randomArray[n]), 0);
     
-    while(TETRIS::isGameContinue()) {
+    while(TETRIS::isGameContinue(tetromino)) {
         KEY key = KEYBOARD::keyInput();
         CONTROL control = TETRIS::keyToControl(key);
 
+        /* Fix tetromino */
         if(control == CONTROL::HARDDROP) {
             TETRIS::controlTetromino(tetromino, control);
             TETRIS::drawTetromino(tetromino, STATE::FIX);
@@ -108,11 +109,17 @@ void TETRIS::init() {
             n++;
             tetromino = TETRIS::addTetromino(START_X, START_Y, static_cast<TYPE>(randomArray[n]), 0);
         }
+
+        /* Continue control tetromino */
         else {
             TETRIS::controlTetromino(tetromino, control);
         }
+
+        TETRIS::clearFullLine();
     }
     
+    WINDOW::print(10, 10, "Game Over", COLOR::DARK_RED);
+    _getch();
 }
 
 /* Board */
@@ -179,7 +186,7 @@ void TETRIS::mapTetromino(Tetromino tetromino, STATE state) {
             for(i=0; i<4; i++) {
                 x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
                 y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
-                map[x][y] = true;
+                map[x][y] = 1;
             }
             break;
         
@@ -187,7 +194,7 @@ void TETRIS::mapTetromino(Tetromino tetromino, STATE state) {
             for(i=0; i<4; i++) {
                 x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
                 y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
-                map[x][y] = false;
+                map[x][y] = 0;
             }
             break;
         
@@ -195,7 +202,7 @@ void TETRIS::mapTetromino(Tetromino tetromino, STATE state) {
             for(i=0; i<4; i++) {
                 x = tetromino.origin.X + block[static_cast<int>(tetromino.type)][tetromino.direction][i][0];
                 y = tetromino.origin.Y + block[static_cast<int>(tetromino.type)][tetromino.direction][i][1];
-                map[x][y] = true;
+                map[x][y] = 2;
             }
             break;
     }
@@ -317,7 +324,7 @@ bool TETRIS::isPositionAvailable(Tetromino tetromino) {
         if((x < 0) || (x >= BOARD_SIZE_X) || (y < 0) || (y >=BOARD_SIZE_Y)) {
             return false;
         }
-        if(map[x][y] == 1) {
+        if(map[x][y] == 2) {
             return false;
         }
     }
@@ -340,8 +347,10 @@ bool TETRIS::isDownAvailable(Tetromino tetromino) {
     }
 }   
 
-/* Game */
-bool TETRIS::isGameContinue() {
+bool TETRIS::isGameContinue(Tetromino tetromino) {
+    if((tetromino.origin.X == START_X) && (tetromino.origin.Y == START_Y) && (!TETRIS::isDownAvailable(tetromino))) {
+        return false;
+    }
     return true;
 }
 
